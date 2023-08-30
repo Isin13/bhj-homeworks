@@ -21,7 +21,7 @@ form.addEventListener('submit', (event) => {
         // Устанавливаем обработчик события изменения состояния загрузки
         xhr.upload.addEventListener('progress', (event) => {
             if (event.lengthComputable) {
-                const progress = (event.loaded / event.total) * 100; // Вычисляем прогресс загрузки в процентах
+                const progress = (event.loaded / event.total); // Вычисляем прогресс загрузки в процентах
                 progressBar.value = progress; // Обновляем значение прогресса
             }
         });
