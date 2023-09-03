@@ -1,41 +1,45 @@
-// Получаем ссылки на необходимые элементы
-const progressBar = document.getElementById('progress');
-const form = document.getElementById('form');
+// Get the form element
+const form = document.querySelector('#form');
 
-// Создаем обработчик события отправки формы
-form.addEventListener('submit', (event) => {
-    event.preventDefault(); // Предотвращаем отправку формы по умолчанию
+// Get the progress element
+const progressBar = document.querySelector('#progress');
 
-    const fileInput = document.getElementById('file');
-    const file = fileInput.files[0];
+// Add event listener for the form submit event
+form.addEventListener('submit', e => {
+  e.preventDefault(); // Prevent form submission
 
-    if (file) {
-        const formData = new FormData(); // Создаем объект FormData для передачи файла
+  // Create an instance of FormData to handle the form data
+  const formData = new FormData(form);
 
-        formData.append('file', file); // Добавляем файл в FormData
+  // Create a new XMLHttpRequest object
+  const xhr = new XMLHttpRequest();
 
-        const xhr = new XMLHttpRequest(); // Создаем объект XMLHttpRequest
-        xhr.open('POST', 'https://students.netoservices.ru/nestjs-backend/upload'); // Устанавливаем URL для отправки запроса
-        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+  // Configure the xhr object
+  xhr.open('POST', 'https://students.netoservices.ru/nestjs-backend/upload');
 
-        // Устанавливаем обработчик события изменения состояния загрузки
-        xhr.upload.addEventListener('progress', (event) => {
-            if (event.lengthComputable) {
-                const progress = (event.loaded / event.total); // Вычисляем прогресс загрузки в процентах
-                progressBar.value = progress; // Обновляем значение прогресса
-            }
-        });
-
-        // Устанавливаем обработчик события окончания загрузки
-        xhr.addEventListener('load', () => {
-            // Здесь можно выполнить дополнительные действия, если загрузка завершилась успешно
-        });
-
-        // Устанавливаем обработчик события ошибки загрузки
-        xhr.addEventListener('error', () => {
-            // Здесь можно выполнить дополнительные действия, если произошла ошибка загрузки
-        });
-
-        xhr.send(formData); // Отправляем запрос с FormData
+  // Add event listener for the progress event
+  xhr.upload.addEventListener('progress', e => {
+    if (e.lengthComputable) {
+      const percentage = Math.round((e.loaded / e.total) * 100);
+      progressBar.value = percentage; // Update the progress value
     }
+  });
+
+  // Add event listener for the load event (request completed)
+  xhr.addEventListener('load', () => {
+    // Check if request was successful (status code 2xx)
+    if (xhr.status >= 200 && xhr.status < 300) {
+      console.log('File uploaded successfully');
+    } else {
+      console.error('Error uploading file:', xhr.statusText);
+    }
+  });
+
+  // Add event listener for the error event (request failed)
+  xhr.addEventListener('error', () => {
+    console.error('Error uploading file: request failed');
+  });
+
+  // Send the form data as the request body
+  xhr.send(formData);
 });
